@@ -16,19 +16,19 @@ def _get_netfx_path():
 def _get_mono_path():
     import os, glob
 
-    paths = glob.glob(os.path.join(os.path.dirname(__file__), "pythonnet", "mono", "clr.*so"))
-    return paths[0]
+    file_path = os.path.dirname(__file__)
+    expected_path_match = os.path.join(file_path, "pythonnet", "mono", "clr.*so")
+    paths = glob.glob(expected_path_match)
+    if paths:
+        return paths[0]
+    raise Exception("Mono not found.")
 
 
 def _load_clr():
     import sys
     from importlib import util
 
-    if sys.platform == "win32":
-        path = _get_netfx_path()
-    else:
-        path = _get_mono_path()
-
+    path = _get_netfx_path() if sys.platform == "win32" else _get_mono_path()
     del sys.modules[__name__]
 
     spec = util.spec_from_file_location("clr", path)
